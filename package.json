@@ -1,0 +1,27 @@
+{
+  "name": "ajounotice",
+  "version": "1.0.0",
+  "description": "Ajou Univ. notice forwarding bot",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "node index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luftaquila/ajounotice.git"
+  },
+  "author": "LUFT-AQUILA",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luftaquila/ajounotice/issues"
+  },
+  "homepage": "https://github.com/luftaquila/ajounotice#readme",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "cheerio": "^1.0.0-rc.10",
+    "dotenv": "^10.0.0",
+    "node-kakaolink": "^1.1.7",
+    "node-schedule": "^2.0.0",
+    "winston": "^3.3.3"
+  }
+}

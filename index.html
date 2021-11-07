@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  </head>
+  <body>
+    <div style='display: table; position: absolute; top: 0; left: 0; height: 100%; width: 100%;'>
+      <div style='display: table-cell; vertical-align: middle; text-align: center;'>
+        <a id='link' href=''></a>
+      </div>
+    </div>
+    
+    <script>
+      const url = new URLSearchParams(window.location.search).get('url');
+      document.getElementById('link').text = url;
+      document.getElementById('link').href = url;
+    </script>
+  </body>
+</html>
