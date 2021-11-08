@@ -16,8 +16,8 @@ npm install
 
 |Key|Value|
 |---|-----|
-|kakaoDevJavascriptKey|[카카오 디벨로퍼스](https://developers.kakao.com/) 내 어플리케이션 Javascript Key|
-|kakaoDevWebPlatform|카카오 디벨로퍼스 내 어플리케이션 Web 플랫폼 URL|
+|kakaoDevJavascriptKey|[카카오 디벨로퍼스](https://developers.kakao.com/) 어플리케이션 Javascript Key|
+|kakaoDevWebPlatform|카카오 디벨로퍼스 어플리케이션 Web 플랫폼 URL|
 |kakaoLoginId|카카오톡 ID|
 |kakaoLoginPw|카카오톡 PW|
 kakaoLinkTemplateId|카카오 디벨로퍼스 카카오링크 메시지 템플릿 ID|
