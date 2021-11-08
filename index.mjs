@@ -32,25 +32,22 @@ async function login() {
 }
 
 async function main() {
-  // latest notice found before
-  let latest = { index: null, category: null, title: null, dep: null, articleNo: null };
+  let latest = await crawler.crawl(); // find latest notice
   
-  // crawl every 5 minutes
+  // crawl every 5 minutes between 7am to 10pm
   schedule.scheduleJob('*/5 7-22 * * *', async () => {
     try {
-      // crawl notices
-      const notices = await crawler.crawl();
+      const notices = await crawler.crawl(); // crawl notices
 
       // compare result with latest before
       for(const notice of notices) {
-        if(latest.articleNo && latest.articleNo < notice.articleNo) {
+        if(latest.articleNo < notice.articleNo) {
           crawler.send(notice); // send message
           await delay(1000);
         }
       }
 
-      // update latest
-      latest = notices[notices.length - 1];
+      latest = notices[notices.length - 1]; // update latest notice
 
       logger.info('Crawling success', { data: util.format(latest) });
     }
