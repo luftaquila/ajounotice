@@ -36,7 +36,7 @@ async function main() {
   let latest = { index: null, category: null, title: null, dep: null, articleNo: null };
   
   // crawl every 5 minutes
-  schedule.scheduleJob('*/5 * * * *', async () => {
+  schedule.scheduleJob('*/5 7-22 * * *', async () => {
     try {
       // crawl notices
       const notices = await crawler.crawl();
@@ -45,6 +45,7 @@ async function main() {
       for(const notice of notices) {
         if(latest.articleNo && latest.articleNo < notice.articleNo) {
           crawler.send(notice); // send message
+          await delay(1000);
         }
       }
 
@@ -56,5 +57,7 @@ async function main() {
     catch(e) { logger.error('Crawling failure', { data: util.format(e) }) }
   });
 }
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export default client
