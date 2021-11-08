@@ -32,7 +32,9 @@ async function login() {
 }
 
 async function main() {
-  let latest = await crawler.crawl(); // find latest notice
+  // find latest notice
+  let latest = await crawler.crawl();
+  latest = latest[latest.length - 1];
   
   // crawl every 5 minutes between 7am to 10pm
   schedule.scheduleJob('*/5 7-22 * * *', async () => {
@@ -48,10 +50,8 @@ async function main() {
       }
 
       latest = notices[notices.length - 1]; // update latest notice
-
-      logger.info('Crawling success', { data: util.format(latest) });
     }
-    catch(e) { logger.error('Crawling failure', { data: util.format(e) }) }
+    catch(e) { logger.error('Scheduled job failure', { data: util.format(e) }) }
   });
 }
 

@@ -21,38 +21,42 @@ const crawler = {
   },
 
   crawl: async function() {
-    // get recent 10 articles from website
-    const res = await axios.get(process.env.noticeUrl, this.config);
-    const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
-    let data = [];
+    try {
+      // get recent 10 articles from website
+      const res = await axios.get(process.env.noticeUrl, this.config);
+      const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
+      let data = [];
 
-    // iterate through each article
-    $('table.board-table tbody tr').each((i, tr) => {
-      const row = {};
-      $('td', tr).each((i, td) => { // iterate through each td
-        switch(i) {
-          case 0:
-            row.index = $(td).text().trim();
-            break;
+      // iterate through each article
+      $('table.board-table tbody tr').each((i, tr) => {
+        const row = {};
+        $('td', tr).each((i, td) => { // iterate through each td
+          switch(i) {
+            case 0:
+              row.index = $(td).text().trim();
+              break;
 
-          case 1:
-            row.category = $(td).text().trim();
-            break;
+            case 1:
+              row.category = $(td).text().trim();
+              break;
 
-          case 2:
-            row.title = $('a', td).text().trim();
-            row.articleNo = $('a', td).attr('href').match(/articleNo=([^&]*)/)[1];
-            break;
+            case 2:
+              row.title = $('a', td).text().trim();
+              row.articleNo = $('a', td).attr('href').match(/articleNo=([^&]*)/)[1];
+              break;
 
-          case 4:
-            row.dep = $(td).text().trim();
-            break;
-        }
+            case 4:
+              row.dep = $(td).text().trim();
+              break;
+          }
+        });
+        data.push(row);
       });
-      data.push(row);
-    });
-
-    return data.reverse(); // make older article first
+      
+      logger.info('Crawling success', { data: util.format(latest) });
+      return data.reverse(); // make older article go first
+    }
+    catch(e) { logger.error('Crawling failure', { data: util.format(e) }) }
   },
 
   send: async function(notice) {
