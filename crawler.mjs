@@ -53,7 +53,7 @@ const crawler = {
         data.push(row);
       });
       
-      logger.info('Crawling success', { data: util.format(latest) });
+      logger.info('Crawling success', { data: util.format(data) });
       return data.reverse(); // make older article go first
     }
     catch(e) { logger.error('Crawling failure', { data: util.format(e) }) }
