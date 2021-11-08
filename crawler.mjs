@@ -63,7 +63,7 @@ const crawler = {
       const res = await axios.get(articleUrl, this.config);
       const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
       const img = $('img', $('div.b-content-box')).attr('src');
-      notice.image = img ? `https://www.ajou.ac.kr/${img}` : 'https://www.ajou.ac.kr/_res/ajou/kr/img/common/img-logo.png';
+      notice.image = img ? `https://www.ajou.ac.kr/${img}` : 'https://luftaquila.io/ajounotice/logo.png';
 
       // send message
       const message = await client.sendLink(process.env.kakaoChatroomName, {
