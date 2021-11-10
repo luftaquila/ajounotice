@@ -37,22 +37,27 @@ async function main() {
   latest = latest[latest.length - 1];
   
   // crawl every 5 minutes between 7am to 10pm
-  schedule.scheduleJob('*/5 7-22 * * *', async () => {
-    try {
-      const notices = await crawler.crawl(); // crawl notices
+  schedule.scheduleJob('*/5 7-21 * * *', async () => { latest = await scheduledTask(latest); });
 
-      // compare result with latest before
-      for(const notice of notices) {
-        if(latest.articleNo < notice.articleNo) {
-          crawler.send(notice); // send message
-          await delay(1000);
-        }
+  // crawl every 20 minutes during midnight for maintain session id
+  schedule.scheduleJob('*/20 22-6 * * *', async () => { latest = await scheduledTask(latest); });
+}
+
+async function scheduledTask(latest) {
+  try {
+    const notices = await crawler.crawl(); // crawl notices
+
+    // compare result with latest before
+    for(const notice of notices) {
+      if(latest.articleNo < notice.articleNo) {
+        crawler.send(notice); // send message
+        await delay(1000);
       }
-
-      latest = notices[notices.length - 1]; // update latest notice
     }
-    catch(e) { logger.error('Scheduled job failure', { data: util.format(e) }) }
-  });
+
+    return notices[notices.length - 1]; // update latest notice
+  }
+  catch(e) { logger.error('Scheduled job failure', { data: util.format(e) }) }
 }
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
