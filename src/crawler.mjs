@@ -5,25 +5,26 @@ import dotenv from 'dotenv'
 import cheerio from 'cheerio'
 
 import logger from './logger.mjs'
-import client from './index.mjs'
+import { client } from './login.mjs'
 
 dotenv.config();
 
 const crawler = {
   // axios config
-  config: {
-    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-    headers: {
-      'Host': 'www.ajou.ac.kr',
-      'Cookie': `kr-month=Y; kr-day=Y; kr-30min=Y; locale=ko; JSESSIONID=${process.env.JSESSIONID};`,
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4693.2 Safari/537.36'
+  config: function(JSESSIONID) {
+    return { 
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      headers: {
+        'Host': 'www.ajou.ac.kr',
+        'Cookie': `kr-month=Y; kr-day=Y; kr-30min=Y; locale=ko; JSESSIONID=${JSESSIONID};`,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4693.2 Safari/537.36'
+      }
     }
   },
-
   crawl: async function() {
     try {
       // get recent 10 articles from website
-      const res = await axios.get(process.env.noticeUrl, this.config);
+      const res = await axios.get(process.env.noticeUrl, this.config(process.env.JSESSIONID));
       const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
       let data = [];
 

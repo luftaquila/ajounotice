@@ -1,45 +1,40 @@
+import fs from 'fs'
 import util from 'util'
 import dotenv from 'dotenv'
+import { parse, stringify } from 'envfile'
 import schedule from 'node-schedule'
-import { ApiClient, KakaoLinkClient } from 'node-kakaolink'
 
-import logger from './logger.mjs'
-import crawler from './crawler.mjs'
+import logger from './src/logger.mjs'
+import crawler from './src/crawler.mjs'
+import { login, client } from './src/login.mjs'
 
 dotenv.config();
 
-const client = new KakaoLinkClient();
 init();
 
 async function init() {
   logger.info('Program startup.');
-  await login();
-
+  await login.siteLogin();
+  await login.kakaoLogin();
   main();
 }
 
-async function login() {
-  // KakaoLink Login for messaging
-  try {
-    const api = await ApiClient.create(process.env.kakaoDevJavascriptKey, process.env.kakaoDevWebPlatform);
-    const res = await api.login({ email: process.env.kakaoLoginId, password: process.env.kakaoLoginPw, keeplogin: true });
-    if(!res.success) throw new Error(`Kakaolink Login failure: ${util.format(res)}`);
-    await client.login(res.result);
-    
-    logger.info('Kakaolink Login success.', { data: res });
-  }
-  catch(e) { logger.error('Kakaolink Login failure.', { data: util.format(e) }) }
-}
-
 async function main() {
-  // find latest notice
-  let latest = await crawler.crawl();
-  latest = latest[latest.length - 1];
+  // load latest notice
+  let latest = JSON.parse(process.env.latest);
+
+  // do very first crawl job
+  scheduledCrawlerJob();
   
-  // crawl every 5 minutes between 7am to 10pm
-  schedule.scheduleJob('*/5 7-22 * * *', async () => {
+  // crawl every 5 minutes
+  schedule.scheduleJob('*/5 7-20 * * 1-5', scheduledCrawlerJob);
+
+  async function scheduledCrawlerJob() {
     try {
       const notices = await crawler.crawl(); // crawl notices
+
+      // check if session cookie is expired
+      if(latest.index > notices[notices.length - 1].index) throw new SessionExpiredError('Session expired');
 
       // compare result with latest before
       for(const notice of notices) {
@@ -49,10 +44,27 @@ async function main() {
         }
       }
 
-      latest = notices[notices.length - 1]; // update latest notice
-    }
-    catch(e) { logger.error('Scheduled job failure', { data: util.format(e) }) }
-  });
+       // update latest
+      latest = notices[notices.length - 1];
+      let envFile = parse(fs.readFileSync('./.env'));
+      envFile.latest = JSON.stringify(latest);
+      fs.writeFileSync('./.env', stringify(envFile));
+    } catch(e) {
+      if(e instanceof SessionExpiredError) {
+        logger.info('Session expired.');
+        await siteLogin();
+        scheduledCrawlerJob();
+      }
+      else logger.error('Scheduled job failure', { data: util.format(e) });
+    } // end catch
+  }
+}
+
+class SessionExpiredError extends Error {
+  constructor(args) {
+    super(args);
+    this.name = 'SessionExpiredError'
+  }
 }
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
