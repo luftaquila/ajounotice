@@ -3,6 +3,7 @@
 
 ## Prerequisites
 * `node` >= v12.0.0
+* [카카오 디벨로퍼스](https://developers.kakao.com/) 어플리케이션
 
 ## Installation
 ```Shell

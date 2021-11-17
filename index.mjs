@@ -44,7 +44,7 @@ async function main() {
         }
       }
 
-       // update latest
+      // update latest
       latest = notices[notices.length - 1];
       let envFile = parse(fs.readFileSync('./.env'));
       envFile.latest = JSON.stringify(latest);
@@ -52,7 +52,7 @@ async function main() {
     } catch(e) {
       if(e instanceof SessionExpiredError) {
         logger.info('Session expired.');
-        await siteLogin();
+        await login.siteLogin();
         scheduledCrawlerJob();
       }
       else logger.error('Scheduled job failure', { data: util.format(e) });

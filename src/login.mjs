@@ -36,9 +36,9 @@ const login = {
       logger.info('Session login success.', { JSESSIONID: process.env.JSESSIONID });
     } catch(e) { 
       logger.error('Session login failure', { data: util.format(e) });
-    } finally { 
-      display.stopSync();
+    } finally {
       driver.quit();
+      display.stopSync();
     }
   },
   kakaoLogin: async function() {
