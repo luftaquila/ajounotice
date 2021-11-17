@@ -23,7 +23,6 @@ kakaoLinkTemplateId|카카오 디벨로퍼스 카카오링크 메시지 템플�
 |kakaoChatroomName|메시지를 보낼 카카오톡 채팅방 이름|
 |ajouLoginId|아주대학교 포탈 ID|
 |ajouLoginPw|아주대학교 포탈 PW|
-|noticeUrl|크롤링할 URL|
 
 ## Run
 ```

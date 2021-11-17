@@ -24,7 +24,7 @@ const crawler = {
   crawl: async function() {
     try {
       // get recent 10 articles from website
-      const res = await axios.get(process.env.noticeUrl, this.config(process.env.JSESSIONID));
+      const res = await axios.get('https://www.ajou.ac.kr/kr/ajou/notice.do?mode=list&&articleLimit=10', this.config(process.env.JSESSIONID));
       const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
       let data = [];
 
