@@ -11,8 +11,7 @@ cd ajounotice
 npm install
 ```
 ## Setup
-1. Rename `example.env` to `.env`
-2. Set `.env` parameters
+1. Write your own `.env` environment variables file.
 
 |Key|Value|
 |---|-----|
@@ -22,8 +21,9 @@ npm install
 |kakaoLoginPw|카카오톡 PW|
 kakaoLinkTemplateId|카카오 디벨로퍼스 카카오링크 메시지 템플릿 ID|
 |kakaoChatroomName|메시지를 보낼 카카오톡 채팅방 이름|
+|ajouLoginId|아주대학교 포탈 ID|
+|ajouLoginPw|아주대학교 포탈 PW|
 |noticeUrl|크롤링할 URL|
-|JSESSIONID|www.ajou.ac.kr 로그인 세션 쿠키 값|
 
 ## Run
 ```
