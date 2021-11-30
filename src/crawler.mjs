@@ -3,11 +3,15 @@ import https from 'https'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import cheerio from 'cheerio'
+import ssl from 'ssl-root-cas'
 
 import logger from './logger.mjs'
 import { client } from './login.mjs'
 
 dotenv.config();
+
+https.globalAgent.options.ca = ssl.create();
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const crawler = {
   // axios config
@@ -24,7 +28,7 @@ const crawler = {
   crawl: async function() {
     try {
       // get recent 10 articles from website
-      const res = await axios.get('https://www.ajou.ac.kr/kr/ajou/notice.do?mode=list&&articleLimit=10', this.config(process.env.JSESSIONID));
+      const res = await axios.get(`https://www.ajou.ac.kr/kr/ajou/notice.do;jsessionid=${process.env.JSESSIONID}?mode=list&&articleLimit=10`, this.config(process.env.JSESSIONID));
       const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
       let data = [];
 
@@ -63,13 +67,15 @@ const crawler = {
   send: async function(notice) {
     try {
       const articleUrl = `https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=${notice.articleNo}`;
+      const loginedArticleUrl = `https://www.ajou.ac.kr/kr/ajou/notice.do;jsessionid=${process.env.JSESSIONID}?mode=view&articleNo=${notice.articleNo}`;
 
       // get target article image url
-      const res = await axios.get(articleUrl, this.config);
+      const res = await axios.get(loginedArticleUrl, this.config(process.env.JSESSIONID));
       const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
       const img = $('img', $('div.b-content-box')).attr('src');
       notice.image = img ? `https://www.ajou.ac.kr/${img}` : 'https://luftaquila.io/ajounotice/assets/logo.png';
 
+      
       // send message
       const message = await client.sendLink(process.env.kakaoChatroomName, {
         link_ver: '4.0',
@@ -85,7 +91,10 @@ const crawler = {
 
       logger.info('Notice sent.', { data: util.format(message) });
     }
-    catch(e) { logger.error('Notice send failure.', { data: util.format(e) }) }
+    catch(e) {
+      logger.error('Notice send failure.', { data: util.format(e) });
+      throw new Error(e);
+    }
   }
 }
 
