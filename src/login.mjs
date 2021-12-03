@@ -26,9 +26,11 @@ const login = {
       await driver.findElement(webdriver.By.id('userId')).sendKeys(process.env.ajouLoginId);
       await driver.findElement(webdriver.By.id('password')).sendKeys(process.env.ajouLoginPw);
       await driver.findElement(webdriver.By.id('loginSubmit')).click();
+      await driver.get('https://www.ajou.ac.kr/kr/index.do?')
       await delay(3000);
       
       const JSESSIONID = await driver.manage().getCookie('JSESSIONID');
+      console.log(await driver.manage().getCookies())
       process.env.JSESSIONID = JSESSIONID.value;
       let envFile = parse(fs.readFileSync('./.env'));
       envFile.JSESSIONID = JSESSIONID.value;
