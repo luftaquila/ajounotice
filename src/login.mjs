@@ -30,7 +30,6 @@ const login = {
       await delay(3000);
       
       const JSESSIONID = await driver.manage().getCookie('JSESSIONID');
-      console.log(await driver.manage().getCookies())
       process.env.JSESSIONID = JSESSIONID.value;
       let envFile = parse(fs.readFileSync('./.env'));
       envFile.JSESSIONID = JSESSIONID.value;

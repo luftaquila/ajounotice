@@ -55,6 +55,7 @@ const crawler = {
               break;
           }
         });
+        if(isNaN(row.index)) return; // skip if index is not a number
         data.push(row);
       });
       
