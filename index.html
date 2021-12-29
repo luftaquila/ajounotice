@@ -5,13 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-    <div style='display: table; position: absolute; top: 0; left: 0; height: 100%; width: 100%;'>
-      <div style='display: table-cell; vertical-align: middle; text-align: center;'>
-        <a id='link' href=''></a>
-      </div>
+    <div style="text-align: center; margin: 2rem 0rem">
+      <span>게시글 링크</span><br>
+      <a id='link' href=''></a>
     </div>
-    
+    <div id='content'></div>
+    <style>
+      img { max-width: 100%; }
+    </style>
     <script>
+      const articleNo = new URLSearchParams(window.location.search).get('articleNo');
+      const xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200) {
+          document.getElementById('content').innerHTML = this.responseText.replace('/_attach/ajou/editor-image', 'https://www.ajou.ac.kr/_attach/ajou/editor-image');
+        }
+      }
+      xhttp.open("GET", `https://luftaquila.io/ajounotice/assets/articles/${articleNo}`, true);
+      xhttp.send();
+
       const url = new URLSearchParams(window.location.search).get('url');
       document.getElementById('link').text = url;
       document.getElementById('link').href = url;

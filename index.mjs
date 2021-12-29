@@ -1,6 +1,7 @@
 import fs from 'fs'
 import util from 'util'
 import dotenv from 'dotenv'
+import moment from 'moment'
 import { parse, stringify } from 'envfile'
 import schedule from 'node-schedule'
 
@@ -9,7 +10,6 @@ import crawler from './src/crawler.mjs'
 import { login, client } from './src/login.mjs'
 
 dotenv.config();
-
 init();
 
 async function init() {
@@ -20,23 +20,22 @@ async function init() {
 }
 
 async function main() {
-  // load latest notice
-  let latest = JSON.parse(process.env.latest);
+  let latest = JSON.parse(process.env.latest); // load latest notice
 
-  // do very first crawl job
-  scheduledCrawlerJob();
+  scheduledCrawlerJob(); // do first crawl job
+  schedule.scheduleJob('*/5 9-19 * * 1-5', scheduledCrawlerJob); // crawl every 5 minutes
   
-  // crawl every 5 minutes
-  schedule.scheduleJob('*/5 7-20 * * 1-5', scheduledCrawlerJob);
-
   async function scheduledCrawlerJob() {
     try {
+      // weather alert and academic calendar notification at 9am
+      if(moment().hour() == 9 && moment().minute() == 0) crawler.alert();
+
       const notices = await crawler.crawl(); // crawl notices
 
       // check if session cookie is expired
-      if(latest.index > notices[notices.length - 1].index) throw new SessionExpiredError('Session expired');
+      if(latest.index > notices[notices.length - 1].index && latest.title != notices[notices.length - 1].title) throw new SessionExpiredError('Session expired');
 
-      // compare result with latest before
+      // compare result with latest before  
       for(const notice of notices) {
         if(latest.articleNo < notice.articleNo) {
           crawler.send(notice); // send message

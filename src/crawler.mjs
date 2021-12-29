@@ -1,7 +1,9 @@
+import fs from 'fs'
 import util from 'util'
 import https from 'https'
 import axios from 'axios'
 import dotenv from 'dotenv'
+import moment from 'moment'
 import cheerio from 'cheerio'
 import ssl from 'ssl-root-cas'
 
@@ -76,6 +78,8 @@ const crawler = {
       const img = $('img', $('div.b-content-box')).attr('src');
       notice.image = img ? `https://www.ajou.ac.kr/${img}` : 'https://luftaquila.io/ajounotice/assets/logo.png';
 
+      const content = $.html($('div.b-content-box'));
+      fs.writeFile(`./assets/articles/${notice.articleNo}`, content, () => {});
       
       // send message
       const message = await client.sendLink(process.env.kakaoChatroomName, {
@@ -85,7 +89,7 @@ const crawler = {
           title: notice.title,
           desc: `${notice.category}/${notice.dep}`,
           link: articleUrl.replace('https://www.ajou.ac.kr/', ''),
-          altlink: `ajounotice?url=${encodeURIComponent(articleUrl)}`,
+          altlink: `ajounotice?url=${encodeURIComponent(articleUrl)}&articleNo=${notice.articleNo}`,
           image: notice.image
         }
       }, 'custom');
@@ -96,7 +100,52 @@ const crawler = {
       logger.error('Notice send failure.', { data: util.format(e) });
       throw new Error(e);
     }
+  },
+
+  alert: async function() {
+    // weather alert
+    const weather = await axios.get(`https://ajoumeow.luftaquila.io/res/weather.json`);
+    const pm10stat =  Number(weather.data.current.dust.pm10) > 30 ? Number(weather.data.current.dust.pm10) > 80 ? Number(weather.data.current.dust.pm10) > 150 ? '🔴매우 나쁨' : '🟡나쁨' : '🟢보통' : '🔵좋음';
+    const pm25stat = Number(weather.data.current.dust.pm25) > 15 ? Number(weather.data.current.dust.pm25) > 35 ? Number(weather.data.current.dust.pm25) > 75 ? '🔴매우 나쁨' : '🟡나쁨' : '🟢보통' : '🔵좋음';
+
+    const weatherMessage = await client.sendLink(process.env.kakaoChatroomName, {
+      link_ver: '4.0',
+      template_id: 67692,
+      template_args: { 
+        temp: `${weather.data.current.temp}℃`,
+        tempSense: `${weather.data.current.tempSense}℃`,
+        pm10: `${weather.data.current.dust.pm10}㎍/㎥, ${pm10stat}`,
+        pm25: `${weather.data.current.dust.pm25}㎍/㎥, ${pm25stat}`,
+        weatherName: `${weather.data.current.weather}`,
+        weatherIcon: `https://luftaquila.io/ajounotice/assets/icons/weather/${weather.data.current.icon}.png`
+      }
+    }, 'custom');
+    
+    await delay(1000);
+
+    // calendar alert
+    let payload = {}, index = 1;
+    const today = moment();
+    const calendar = await axios.post(`https://mportal.ajou.ac.kr/portlet/p019/p019List.ajax`, { yyyymm: today.format('YYYYMM') });
+
+    for(const item of calendar.data.p019List) {
+      if(today.isSameOrAfter(item.startDt) && today.isSameOrBefore(item.endDt)) {
+        payload[`title${index}`] = item.info;
+        payload[`desc${index}`] = moment(item.startDt).format(`M월 D일(${item.startDay})`) + ' ~ ' + moment(item.endDt).format(`M월 D일(${item.endDay})`);
+        index++;
+      }
+    }
+
+    if(payload.title1) { // only if there is at least one content
+      const calendarMessage = await client.sendLink(process.env.kakaoChatroomName, {
+        link_ver: '4.0',
+        template_id: 67695,
+        template_args: payload
+      }, 'custom');
+    }
   }
 }
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export default crawler

@@ -21,6 +21,7 @@
     "cheerio": "^1.0.0-rc.10",
     "dotenv": "^10.0.0",
     "envfile": "^6.17.0",
+    "moment": "^2.29.1",
     "node-kakaolink": "^1.1.7",
     "node-schedule": "^2.0.0",
     "selenium-webdriver": "^4.0.0",
