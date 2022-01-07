@@ -33,11 +33,11 @@ async function main() {
       const notices = await crawler.crawl(); // crawl notices
 
       // check if session cookie is expired
-      if(latest.index > notices[notices.length - 1].index && latest.title != notices[notices.length - 1].title) throw new SessionExpiredError('Session expired');
+      if(Number(latest.index) > Number(notices[notices.length - 1].index) && latest.title != notices[notices.length - 1].title) throw new SessionExpiredError('Session expired');
 
       // compare result with latest before  
       for(const notice of notices) {
-        if(latest.articleNo < notice.articleNo) {
+        if(Number(latest.articleNo) < Number(notice.articleNo)) {
           crawler.send(notice); // send message
           await delay(1000);
         }
