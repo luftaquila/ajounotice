@@ -129,7 +129,7 @@ const crawler = {
     const calendar = await axios.post(`https://mportal.ajou.ac.kr/portlet/p019/p019List.ajax`, { yyyymm: today.format('YYYYMM') });
 
     for(const item of calendar.data.p019List) {
-      if(today.isSameOrAfter(item.startDt) && today.isSameOrBefore(item.endDt)) {
+      if(today.isSameOrAfter(item.startDt) && today.isSameOrBefore(moment(item.endDt).add(1, 'days'))) {
         payload[`title${index}`] = item.info;
         payload[`desc${index}`] = moment(item.startDt).format(`M월 D일(${item.startDay})`) + ' ~ ' + moment(item.endDt).format(`M월 D일(${item.endDay})`);
         index++;

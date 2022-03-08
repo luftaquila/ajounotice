@@ -14,26 +14,30 @@ init();
 
 async function init() {
   logger.info('Program startup.');
-  await login.siteLogin();
+  if(!process.env.JSESSIONID) await login.siteLogin();
   await login.kakaoLogin();
   main();
 }
 
 async function main() {
   let latest = JSON.parse(process.env.latest); // load latest notice
+  let currentDate = moment().format('YYYY-MM-DD'); // save current moment
 
   scheduledCrawlerJob(); // do first crawl job
   schedule.scheduleJob('*/5 9-19 * * 1-5', scheduledCrawlerJob); // crawl every 5 minutes
   
   async function scheduledCrawlerJob() {
     try {
-      // weather alert and academic calendar notification at 9am
-      if(moment().hour() == 9 && moment().minute() == 0) crawler.alert();
+      // weather alert and academic calendar notification when date changes
+      if(currentDate != moment().format('YYYY-MM-DD') && new Date().getHours() == 9) {
+        currentDate = moment().format('YYYY-MM-DD');
+        crawler.alert();
+      }
 
       const notices = await crawler.crawl(); // crawl notices
 
       // check if session cookie is expired
-      if(Number(latest.index) > Number(notices[notices.length - 1].index) && latest.title != notices[notices.length - 1].title) throw new SessionExpiredError('Session expired');
+      if(Number(latest.index) > Number(notices[notices.length - 1].index)) throw new SessionExpiredError('Session expired');
 
       // compare result with latest before  
       for(const notice of notices) {
@@ -51,6 +55,7 @@ async function main() {
     } catch(e) {
       if(e instanceof SessionExpiredError) {
         logger.info('Session expired.');
+        await delay(30000); // wait 30 sec
         await login.siteLogin();
         scheduledCrawlerJob();
       }

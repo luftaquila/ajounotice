@@ -1,5 +1,5 @@
 **/.env
 **/node_modules
-**/.log
+**/.log*
 assets/articles
 chromedriver
