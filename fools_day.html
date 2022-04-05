@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      .classic {
+        text-align: center;
+        height: 36px;
+        line-height: 30px;
+        border: 3px solid!important;
+        font-size: 16px;
+        background-color: #fdfdfd;
+        border-color: #4D81F1;
+        color: #4D81F1;
+        cursor: pointer;
+        box-shadow: 3px 3px #666;
+        margin-right: 10px;
+        margin-top: 10px;
+        padding: 5px 20px;
+        outline: none;
+      }
+      .classic:hover {
+        opacity: 0.7;
+      }
+      .classic:active {
+        background-color: #eee;
+        opacity: 1;
+      }
+    </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0DBRXRMBQ8"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-0DBRXRMBQ8');
+    </script>
+  </head>
+  <body>
+    <div style='width: 80%; text-align: center; margin: 0% 10%;'>
+      <div style="margin-top: 30vh;"><span style="font-size: 3rem; font-weight: bold;">뻥</span> 입니다</div>
+      <br>
+      아주대학교 학우 여러분 모두<br>즐거운 중간고사 되시고<br>만우절 좋은 성적 내세요<br><span style='font-size: 3rem;'>🙃</span>
+      <br><br><br>
+      <a class='classic' onclick='share();'>나도 놀리기!</a>
+    </div>
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+    <script>
+      Kakao.init('14b07e7037192beae6b790168bb9682f');
+      function share() {
+        Kakao.Link.sendCustom({
+          templateId: 64842,
+          templateArgs: {
+            title: '[중요] [공지] 코로나19 확산으로 인한 중간고사 무기한 연기 안내',
+            desc: `학사/교무팀`,
+            link: 'kr/ajou/notice.do',
+            altlink: `ajounotice/fools_day.html`,
+            image: 'https://luftaquila.io/ajounotice/assets/logo.png'
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

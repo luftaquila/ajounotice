@@ -75,10 +75,14 @@ const crawler = {
       // get target article image url
       const res = await axios.get(loginedArticleUrl, this.config(process.env.JSESSIONID));
       const $ = cheerio.load(res.data.replace(/\s\s+/g, ' '));
-      const img = $('img', $('div.b-content-box')).attr('src');
-      notice.image = img ? `https://www.ajou.ac.kr/${img}` : 'https://luftaquila.io/ajounotice/assets/logo.png';
 
-      const content = $.html($('div.b-content-box'));
+      // replace img src with exact url if not
+      $('img[src^="/_attach/ajou/"]').replaceWith(function() { return $(this).attr('src', `https://www.ajou.ac.kr${$(this).attr('src')}`); });
+
+      const img = $('img', $('div.b-content-box')).attr('src');
+      notice.image = img ? img : 'https://luftaquila.io/ajounotice/assets/logo.png';
+
+      let content = $.html($('div.b-content-box'));
       fs.writeFile(`./assets/articles/${notice.articleNo}`, content, () => {});
       
       // send message
@@ -89,7 +93,7 @@ const crawler = {
           title: notice.title,
           desc: `${notice.category}/${notice.dep}`,
           link: articleUrl.replace('https://www.ajou.ac.kr/', ''),
-          altlink: `ajounotice?url=${encodeURIComponent(articleUrl)}&articleNo=${notice.articleNo}`,
+          altlink: `ajounotice?url=${encodeURIComponent(articleUrl)}&articleNo=${notice.articleNo}&title=${notice.title}&desc=${notice.category + '/' + notice.dep}&image=${notice.image}`,
           image: notice.image
         }
       }, 'custom');
