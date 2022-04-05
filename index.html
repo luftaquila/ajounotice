@@ -6,8 +6,6 @@
     <style>
       .classic {
         text-align: center;
-        height: 36px;
-        line-height: 30px;
         border: 3px solid!important;
         font-size: 16px;
         background-color: #fdfdfd;
@@ -18,6 +16,7 @@
         padding: 5px 20px;
         outline: none;
         text-decoration: none;
+        border-radius: 10px;
       }
       .classic:hover {
         opacity: 0.7;
@@ -26,9 +25,9 @@
         background-color: #eee;
         opacity: 1;
       }
-      .classic.skyblue {
-        border-color: #039BE5;
-        color: #039BE5;
+      .classic.yellow {
+        border-color: #f6e23e!important;
+        color: #f6e23e;
       }
       .classic.green {
         border-color: #388e3c;
@@ -54,19 +53,31 @@
     </script>
   </head>
   <body>
-    <div style="text-align: center; margin: 2rem 0rem">
+    <div style="text-align: center; margin: 1rem 0rem;">
       <div>원본 게시글</div>
       <div><a id='link' href=''></a></div>
-      <div style='margin-top: .5rem;'>
-        <span onclick="notify();" style="font-size: .7rem; color: #555; text-decoration: underline; cursor: pointer;">게시글에 접근 권한이 없다는 알림이 뜬다면</span><br>
+      <div style='margin: .5rem 0 1rem'>
+        <span onclick="notify();" style="font-size: .7rem; color: #555; text-decoration: underline; cursor: pointer;">→ 게시글에 접근 권한이 없다는 알림이 뜬다면 ←</span><br>
       </div>
-      <div style="margin-top: 2rem;">
-        <a class='classic orange' onclick='share();'>카카오톡으로 공유하기</a>
-        <br><br>
-        <a class='classic green' href='https://open.kakao.com/o/g8BxtUId'>공지방 들어가기</a>
+
+      <div class='classic yellow' style="display: inline-block; color: #38201f; line-height: 10px; background: url(assets/icons/kakaotalk.svg) no-repeat 10% 57%, #f6e23e; background-size: 20px; padding: 10px 10px 10px 33px; -webkit-tap-highlight-color: transparent;">
+        <a style="text-decoration: none; color: inherit" href='https://open.kakao.com/o/g8BxtUId'>공지방</a>
       </div>
+
+      &ensp;&ensp;
+
+      <div onclick='share()' class='classic yellow' style="display: inline-block; color: #38201f; line-height: 10px; background: url(assets/icons/kakaotalk.svg) no-repeat 10% 57%, #f6e23e; background-size: 20px; padding: 10px 10px 10px 35px; -webkit-tap-highlight-color: transparent;">
+        공유하기
+      </div>
+
+      <br><br>
+      
     </div>
-    <div id='content'></div>
+    <div style="margin-bottom: 2rem;">
+      <h3 id='title'></h3>
+      <h4 id='desc' style="text-align: right; padding-right: 1rem;"></h4>
+    </div>
+    <div id='content' style="margin-bottom: 5rem;"></div>
     <style>
       img { max-width: 100%; }
     </style>
@@ -87,6 +98,8 @@
       const url = new URLSearchParams(window.location.search).get('url');
       document.getElementById('link').text = url;
       document.getElementById('link').href = url;
+      document.getElementById('title').innerHTML = new URLSearchParams(window.location.search).get('title');
+      document.getElementById('desc').innerHTML = new URLSearchParams(window.location.search).get('desc');
       
       function share() {
         Kakao.Link.sendCustom({
